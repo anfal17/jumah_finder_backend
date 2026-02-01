@@ -10,19 +10,24 @@ connectDB();
 
 const app = express();
 
-// CORS Configuration - Allow multiple origins
+// CORS Configuration - Allow multiple origins including Vercel previews
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'https://jumah-finder-blr.vercel.app',  // Production domain
     process.env.FRONTEND_URL
-].filter(Boolean); // Remove undefined values
+].filter(Boolean);
+
+// Regex to match Vercel preview URLs (anfals-projects-00db9509.vercel.app)
+const vercelPreviewPattern = /^https:\/\/.*-anfals-projects-00db9509\.vercel\.app$/;
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, curl, etc)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.includes(origin)) {
+        // Check exact match or Vercel preview pattern
+        if (allowedOrigins.includes(origin) || vercelPreviewPattern.test(origin)) {
             callback(null, true);
         } else {
             console.log('Blocked by CORS:', origin);
